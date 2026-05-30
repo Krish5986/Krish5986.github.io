@@ -1,0 +1,936 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krish — AI/ML Developer</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,400;0,500;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --border: #1e1e2e;
+    --accent: #4f8ef7;
+    --accent2: #7c6af7;
+    --green: #3dd68c;
+    --orange: #f7934f;
+    --text: #e8e8f0;
+    --muted: #6b6b82;
+    --card: #13131c;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    overflow-x: hidden;
+  }
+
+  /* NOISE TEXTURE */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.4;
+  }
+
+  /* GRID BACKGROUND */
+  body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(79,142,247,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(79,142,247,0.03) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container { max-width: 900px; margin: 0 auto; padding: 0 32px; position: relative; z-index: 1; }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    padding: 20px 0;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+  }
+  nav .inner {
+    max-width: 900px; margin: 0 auto; padding: 0 32px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .nav-logo {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.02em;
+  }
+  .nav-logo span { color: var(--accent); }
+  .nav-links { display: flex; gap: 28px; list-style: none; }
+  .nav-links a {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-decoration: none;
+    letter-spacing: 0.05em;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    padding-top: 80px;
+  }
+  .hero-inner { padding: 80px 0 60px; }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(61,214,140,0.08);
+    border: 1px solid rgba(61,214,140,0.2);
+    color: var(--green);
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 32px;
+    letter-spacing: 0.05em;
+    animation: fadeUp 0.6s ease both;
+  }
+  .badge::before {
+    content: '';
+    width: 6px; height: 6px;
+    background: var(--green);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    margin-bottom: 24px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+  .hero h1 .line2 {
+    display: block;
+    background: linear-gradient(135deg, var(--accent) 0%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero-desc {
+    font-size: 1.05rem;
+    color: var(--muted);
+    max-width: 520px;
+    margin-bottom: 40px;
+    line-height: 1.8;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+  .hero-desc strong { color: var(--text); font-weight: 500; }
+
+  .hero-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 48px;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+  .tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    padding: 5px 12px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    background: var(--surface);
+  }
+  .tag.highlight { border-color: rgba(79,142,247,0.3); color: var(--accent); background: rgba(79,142,247,0.05); }
+
+  .hero-cta {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    animation: fadeUp 0.6s 0.4s ease both;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 6px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.04em;
+    text-decoration: none;
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-primary:hover { background: #6aa0f9; transform: translateY(-1px); }
+  .btn-outline {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+  }
+  .btn-outline:hover { border-color: var(--accent); color: var(--accent); transform: translateY(-1px); }
+
+  /* GLOW ORB */
+  .glow-orb {
+    position: absolute;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(79,142,247,0.06) 0%, transparent 70%);
+    top: 50%; right: -200px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SECTIONS */
+  section { padding: 100px 0; position: relative; z-index: 1; }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    letter-spacing: -0.03em;
+    margin-bottom: 16px;
+    line-height: 1.15;
+  }
+  .section-sub {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 500px;
+    margin-bottom: 56px;
+    line-height: 1.7;
+  }
+
+  /* DIVIDER */
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 0;
+  }
+
+  /* ABOUT */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 48px;
+    align-items: start;
+  }
+  .about-text p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    line-height: 1.85;
+    margin-bottom: 16px;
+  }
+  .about-text p strong { color: var(--text); font-weight: 500; }
+  .about-text .quote {
+    border-left: 2px solid var(--accent);
+    padding: 12px 20px;
+    margin: 24px 0;
+    font-style: italic;
+    color: var(--text);
+    font-size: 0.9rem;
+    background: rgba(79,142,247,0.04);
+    border-radius: 0 6px 6px 0;
+  }
+
+  .stats-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+  .stat-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    transition: border-color 0.2s;
+  }
+  .stat-card:hover { border-color: rgba(79,142,247,0.3); }
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 1.8rem;
+    color: var(--accent);
+    letter-spacing: -0.03em;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* PROJECTS */
+  .projects-list { display: flex; flex-direction: column; gap: 2px; }
+
+  .project-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 32px;
+    transition: all 0.25s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    opacity: 0;
+    transition: opacity 0.25s;
+  }
+  .project-card:hover { border-color: rgba(79,142,247,0.25); transform: translateY(-2px); }
+  .project-card:hover::before { opacity: 1; }
+
+  .project-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 12px;
+    gap: 16px;
+  }
+  .project-title {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    letter-spacing: -0.02em;
+    color: var(--text);
+  }
+  .project-badge {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 4px 10px;
+    border-radius: 100px;
+    letter-spacing: 0.06em;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .badge-research { background: rgba(61,214,140,0.1); color: var(--green); border: 1px solid rgba(61,214,140,0.2); }
+  .badge-prod { background: rgba(79,142,247,0.1); color: var(--accent); border: 1px solid rgba(79,142,247,0.2); }
+  .badge-nlp { background: rgba(247,147,79,0.1); color: var(--orange); border: 1px solid rgba(247,147,79,0.2); }
+
+  .project-desc {
+    color: var(--muted);
+    font-size: 0.88rem;
+    line-height: 1.75;
+    margin-bottom: 20px;
+  }
+  .project-desc strong { color: var(--text); font-weight: 500; }
+
+  .project-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .tech-chip {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    padding: 3px 9px;
+    border-radius: 3px;
+    background: var(--surface);
+    color: var(--muted);
+    border: 1px solid var(--border);
+    letter-spacing: 0.03em;
+  }
+
+  .project-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+  .project-link {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: gap 0.2s;
+  }
+  .project-link:hover { gap: 10px; }
+
+  /* EXPERIENCE */
+  .timeline { position: relative; }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 8px;
+    bottom: 0;
+    width: 1px;
+    background: linear-gradient(180deg, var(--accent), transparent);
+  }
+
+  .timeline-item {
+    padding-left: 32px;
+    margin-bottom: 48px;
+    position: relative;
+  }
+  .timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -4px;
+    top: 8px;
+    width: 9px; height: 9px;
+    background: var(--accent);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+    box-shadow: 0 0 0 3px rgba(79,142,247,0.2);
+  }
+
+  .timeline-date {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+  }
+  .timeline-role {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-bottom: 2px;
+    letter-spacing: -0.02em;
+  }
+  .timeline-org {
+    font-size: 0.85rem;
+    color: var(--muted);
+    margin-bottom: 14px;
+  }
+  .timeline-org em { color: var(--accent); font-style: normal; }
+  .timeline-points { list-style: none; }
+  .timeline-points li {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+    margin-bottom: 6px;
+    padding-left: 16px;
+    position: relative;
+  }
+  .timeline-points li::before {
+    content: '→';
+    position: absolute;
+    left: 0;
+    color: var(--border);
+    font-size: 0.8rem;
+  }
+  .timeline-points li strong { color: var(--text); font-weight: 500; }
+
+  /* SKILLS */
+  .skills-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  .skill-group {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 22px;
+    transition: border-color 0.2s;
+  }
+  .skill-group:hover { border-color: rgba(79,142,247,0.25); }
+  .skill-group-title {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: var(--accent);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  .skill-items { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-item {
+    font-size: 0.78rem;
+    color: var(--muted);
+    background: var(--surface);
+    padding: 4px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    transition: all 0.15s;
+  }
+  .skill-item:hover { color: var(--text); border-color: rgba(79,142,247,0.3); }
+
+  /* CONTACT */
+  .contact-inner {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 60px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 0%, rgba(79,142,247,0.05), transparent 60%);
+    pointer-events: none;
+  }
+  .contact-inner h2 {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: 2.2rem;
+    letter-spacing: -0.03em;
+    margin-bottom: 12px;
+  }
+  .contact-inner p {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin-bottom: 36px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 0;
+    border-top: 1px solid var(--border);
+    position: relative;
+    z-index: 1;
+  }
+  footer .inner {
+    max-width: 900px; margin: 0 auto; padding: 0 32px;
+    display: flex; justify-content: space-between; align-items: center;
+    flex-wrap: wrap; gap: 12px;
+  }
+  footer p {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.68rem;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* SCROLL ANIMATIONS */
+  .reveal {
+    opacity: 0;
+    transform: translateY(24px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 700px) {
+    .about-grid { grid-template-columns: 1fr; }
+    .skills-grid { grid-template-columns: 1fr 1fr; }
+    .contact-inner { padding: 36px 24px; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <a href="#" class="nav-logo">K<span>.</span></a>
+    <ul class="nav-links">
+      <li><a href="#about">about</a></li>
+      <li><a href="#projects">projects</a></li>
+      <li><a href="#experience">experience</a></li>
+      <li><a href="#contact">contact</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+  <section class="hero">
+    <div class="container" style="position:relative;">
+      <div class="glow-orb"></div>
+      <div class="hero-inner">
+        <div class="badge">Research Intern · IIT Delhi</div>
+        <h1>
+          Building AI that<br>
+          <span class="line2">actually works.</span>
+        </h1>
+        <p class="hero-desc">
+          I'm <strong>Krish</strong> — an AI/ML developer from Delhi. I build RAG pipelines, NLP systems, and data intelligence tools. Currently doing <strong>PM2.5 sensor calibration research at IIT Delhi</strong> and completing the AI/ML Specialization at IIT Guwahati.
+        </p>
+        <div class="hero-tags">
+          <span class="tag highlight">RAG Systems</span>
+          <span class="tag highlight">NLP</span>
+          <span class="tag highlight">Sensor ML</span>
+          <span class="tag">Python</span>
+          <span class="tag">PyTorch</span>
+          <span class="tag">FastAPI</span>
+          <span class="tag">Docker</span>
+          <span class="tag">Streamlit</span>
+        </div>
+        <div class="hero-cta">
+          <a href="https://github.com/Krish5986" target="_blank" class="btn btn-primary">↗ GitHub</a>
+          <a href="https://www.linkedin.com/in/krish-19425a272/" target="_blank" class="btn btn-outline">↗ LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="section-label reveal">/ about</div>
+      <h2 class="section-title reveal">Non-traditional path.<br>Real results.</h2>
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p>I'm pursuing <strong>BA English Honours from DU SOL</strong> alongside an <strong>AI/ML Specialization from IIT Guwahati</strong>. Everything technical I know has been self-taught — built project by project, problem by problem.</p>
+          <p>I got my <strong>IIT Delhi research internship</strong> the hard way — a cold LinkedIn application, an interview I thought I failed, and an email I didn't expect. That's become my operating model: apply anyway, figure it out when you're in.</p>
+          <div class="quote">"Yesterday the sensor got corrupted. Vamsi sir offered coffee. I thought — not the time for coffee, first finish the task. Found the issue, recovered the data, documented everything."</div>
+          <p>I trained in English Honours to make complex things clear to people who don't understand them yet. In AI and research, that turns out to matter a lot.</p>
+        </div>
+        <div class="reveal">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-num">5+</div>
+              <div class="stat-label">shipped projects</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">48h</div>
+              <div class="stat-label">RAG system built</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">~28%</div>
+              <div class="stat-label">ASR accuracy gain</div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-num">36k+</div>
+              <div class="stat-label">records analysed</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="container">
+      <div class="section-label reveal">/ projects</div>
+      <h2 class="section-title reveal">Things I've built.</h2>
+      <p class="section-sub reveal">Every project was built to solve a real problem — not to pad a portfolio.</p>
+
+      <div class="projects-list">
+
+        <div class="project-card reveal">
+          <div class="project-header">
+            <div class="project-title">Google Drive RAG System</div>
+            <span class="project-badge badge-prod">Production</span>
+          </div>
+          <p class="project-desc">
+            Built end-to-end in <strong>48 hours</strong> as a trial assignment. Connects to Google Drive via OAuth2, extracts PDFs and Docs, chunks into 512-word overlapping segments, embeds using all-MiniLM-L6-v2, stores in FAISS with SQLite metadata. REST endpoints, query caching, incremental sync — all from scratch, no frameworks. Containerised with Docker.
+          </p>
+          <div class="project-tech">
+            <span class="tech-chip">FastAPI</span>
+            <span class="tech-chip">FAISS</span>
+            <span class="tech-chip">SentenceTransformers</span>
+            <span class="tech-chip">Groq LLaMA3</span>
+            <span class="tech-chip">SQLite</span>
+            <span class="tech-chip">Docker</span>
+            <span class="tech-chip">OAuth2</span>
+          </div>
+          <div class="project-meta">
+            <a href="https://github.com/Krish5986/rag-gdrive" target="_blank" class="project-link">View on GitHub →</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-header">
+            <div class="project-title">Hindi ASR & Evaluation Pipeline</div>
+            <span class="project-badge badge-nlp">NLP / Speech</span>
+          </div>
+          <p class="project-desc">
+            End-to-end Hindi-English speech-to-text pipeline. Improved baseline Whisper accuracy by <strong>~28% on Google FLEURS</strong> through a deterministic NLP post-processing layer for code-switching and spoken number normalisation. Built a custom <strong>Word Lattice Evaluation framework using Dynamic Programming</strong> where standard WER metrics fail — novel methodology, not a wrapper.
+          </p>
+          <div class="project-tech">
+            <span class="tech-chip">PyTorch</span>
+            <span class="tech-chip">Whisper</span>
+            <span class="tech-chip">Hugging Face</span>
+            <span class="tech-chip">Dynamic Programming</span>
+            <span class="tech-chip">NLP</span>
+          </div>
+          <div class="project-meta">
+            <a href="https://github.com/Krish5986/Hindi-ASR-Evaluation-Pipeline" target="_blank" class="project-link">View on GitHub →</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-header">
+            <div class="project-title">Project Samarth — Agricultural Policy Intelligence</div>
+            <span class="project-badge badge-prod">Live Demo</span>
+          </div>
+          <p class="project-desc">
+            Structured data analysis system over <strong>36,000+ government agricultural and rainfall records</strong> from data.gov.in. Four analytical engines: rainfall vs crop comparison, district-level production analysis, yield-rainfall correlation (Pearson), and dynamic policy recommendations. Deliberately chose <strong>deterministic Pandas over LLM generation</strong> — every number traces to a specific row. Fully auditable for policy decisions.
+          </p>
+          <div class="project-tech">
+            <span class="tech-chip">Pandas</span>
+            <span class="tech-chip">NumPy</span>
+            <span class="tech-chip">Matplotlib</span>
+            <span class="tech-chip">Streamlit</span>
+            <span class="tech-chip">Pearson Correlation</span>
+          </div>
+          <div class="project-meta">
+            <a href="https://github.com/Krish5986/Project_Samarth_Q_and_A" target="_blank" class="project-link">View Live Demo →</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-header">
+            <div class="project-title">Platform Intelligence Agent — AI Resume Analyser</div>
+            <span class="project-badge badge-prod">Deployed</span>
+          </div>
+          <p class="project-desc">
+            Agentic AI system using Gemini 2.5 Flash for structured data extraction from unstructured PDFs at scale. Implemented <strong>Temperature 0.0 deterministic control</strong> for consistent, auditable outputs — critical for high-stakes pipelines. Multi-document processing with session state and real-time analytics dashboard for non-technical users.
+          </p>
+          <div class="project-tech">
+            <span class="tech-chip">Gemini 2.5 Flash</span>
+            <span class="tech-chip">Streamlit</span>
+            <span class="tech-chip">PyPDF2</span>
+            <span class="tech-chip">Pandas</span>
+          </div>
+          <div class="project-meta">
+            <a href="https://github.com/Krish5986/JSO-Phase2-Intelligence-Agent" target="_blank" class="project-link">View on GitHub →</a>
+          </div>
+        </div>
+
+        <div class="project-card reveal">
+          <div class="project-header">
+            <div class="project-title">Healthcare Feedback Analytics</div>
+            <span class="project-badge badge-nlp">NLP</span>
+          </div>
+          <p class="project-desc">
+            NLP classification pipeline over 300+ unstructured patient reviews from Delhi hospitals. Multi-category labeling system built from scratch without labeled training data — careful feature engineering and iterative validation. Converted raw qualitative data into structured visualisations for non-technical stakeholders.
+          </p>
+          <div class="project-tech">
+            <span class="tech-chip">Scikit-learn</span>
+            <span class="tech-chip">NLP</span>
+            <span class="tech-chip">Pandas</span>
+            <span class="tech-chip">Matplotlib</span>
+          </div>
+          <div class="project-meta">
+            <a href="https://github.com/Krish5986/Delhi-Hospital-AI-Analysis" target="_blank" class="project-link">View on GitHub →</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-label reveal">/ experience</div>
+      <h2 class="section-title reveal">Where I've worked.</h2>
+      <p class="section-sub reveal">Research, production, and everything in between.</p>
+
+      <div class="timeline">
+        <div class="timeline-item reveal">
+          <div class="timeline-date">MAY 2025 — JUL 2025</div>
+          <div class="timeline-role">Research Intern</div>
+          <div class="timeline-org"><em>IIT Delhi</em> — School of Interdisciplinary Research</div>
+          <ul class="timeline-points">
+            <li>Working under PhD researcher <strong>Vamsi Krishna Bankapalli</strong> (NIT Trichy → IIT Delhi PhD, supervised by faculty from Design, Applied Mechanics, and Electrical Engineering)</li>
+            <li>Project: <strong>"Generation of PM2.5 and Weather Datasets at High Spatiotemporal Resolution Using Fluid-Physics-Based ML Models"</strong> — addressing India's air pollution crisis</li>
+            <li>Sensor fabrication and calibration data collection using four low-cost sensors in a climate chamber</li>
+            <li>Building ML pipeline to identify and reduce sensor errors in environmental data collection</li>
+            <li>Recovered corrupted sensor data independently using systematic debugging — same data I needed for analysis</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-date">FEB 2025 — PRESENT</div>
+          <div class="timeline-role">AI & ML Specialization Student</div>
+          <div class="timeline-org"><em>IIT Guwahati</em></div>
+          <ul class="timeline-points">
+            <li>Advanced coursework: Linear Algebra, Statistics, Probability, NLP, Computer Vision, Deep Learning</li>
+            <li>Hands-on projects across NLP, speech recognition, and real-world AI systems</li>
+          </ul>
+        </div>
+
+        <div class="timeline-item reveal">
+          <div class="timeline-date">JUN 2024 — JAN 2025</div>
+          <div class="timeline-role">Virtual Customer Service Associate</div>
+          <div class="timeline-org"><em>Amazon</em> — International Process</div>
+          <ul class="timeline-points">
+            <li>95%+ query resolution efficiency across high-volume global operations</li>
+            <li>Analysed customer feedback patterns — same analytical mindset applied to ML error analysis</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SKILLS -->
+  <section id="skills">
+    <div class="container">
+      <div class="section-label reveal">/ skills</div>
+      <h2 class="section-title reveal">What I work with.</h2>
+      <div class="skills-grid">
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Languages</div>
+          <div class="skill-items">
+            <span class="skill-item">Python</span>
+            <span class="skill-item">SQL</span>
+          </div>
+        </div>
+        <div class="skill-group reveal">
+          <div class="skill-group-title">ML / AI</div>
+          <div class="skill-items">
+            <span class="skill-item">PyTorch</span>
+            <span class="skill-item">Hugging Face</span>
+            <span class="skill-item">FAISS</span>
+            <span class="skill-item">Whisper</span>
+            <span class="skill-item">RAG</span>
+            <span class="skill-item">Scikit-learn</span>
+          </div>
+        </div>
+        <div class="skill-group reveal">
+          <div class="skill-group-title">LLM APIs</div>
+          <div class="skill-items">
+            <span class="skill-item">Gemini</span>
+            <span class="skill-item">Groq</span>
+            <span class="skill-item">OpenAI</span>
+            <span class="skill-item">Prompt Eng.</span>
+          </div>
+        </div>
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Data</div>
+          <div class="skill-items">
+            <span class="skill-item">Pandas</span>
+            <span class="skill-item">NumPy</span>
+            <span class="skill-item">Matplotlib</span>
+            <span class="skill-item">ChromaDB</span>
+          </div>
+        </div>
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Deployment</div>
+          <div class="skill-items">
+            <span class="skill-item">FastAPI</span>
+            <span class="skill-item">Streamlit</span>
+            <span class="skill-item">Docker</span>
+            <span class="skill-item">Git</span>
+          </div>
+        </div>
+        <div class="skill-group reveal">
+          <div class="skill-group-title">Methods</div>
+          <div class="skill-items">
+            <span class="skill-item">NLP</span>
+            <span class="skill-item">Sensor Calib.</span>
+            <span class="skill-item">Eval Design</span>
+            <span class="skill-item">Error Analysis</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-inner reveal">
+        <h2>Let's talk.</h2>
+        <p>Open to research collaborations, internships, and interesting problems. Always reply.</p>
+        <div class="contact-links">
+          <a href="mailto:sethikrish23@gmail.com" class="btn btn-primary">✉ sethikrish23@gmail.com</a>
+          <a href="https://github.com/Krish5986" target="_blank" class="btn btn-outline">↗ GitHub</a>
+          <a href="https://www.linkedin.com/in/krish-19425a272/" target="_blank" class="btn btn-outline">↗ LinkedIn</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="inner">
+    <p>© 2025 Krish · Delhi, India</p>
+    <p>Built with intention, not templates.</p>
+  </div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 60);
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>
